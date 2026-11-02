@@ -5,10 +5,10 @@ STM32F411 Project test
 
 ## Hardware
 
-![STM32F411 블록도](media/image1.PNG)
-![STM32F411 블록도](media/imaage2.PNG)
-![STM32F411 블록도](media/image3.PNG)
-![STM32F411 블록도](media/image4.PNG)
+![STM32F411 블록도](media/image1.png)
+![STM32F411 블록도](media/image2.png)
+![STM32F411 블록도](media/image3.png)
+![STM32F411 블록도](media/image4.png)
 
 # H1 제목
 ## H2 제목  
