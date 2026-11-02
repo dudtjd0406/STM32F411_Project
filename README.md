@@ -52,6 +52,24 @@ def hello():
 
 ![](media/image1.PNG)
 
+<p align="center">
+  <img src="media/image1.PNG">
+</p>
 
+<p align="center">
+  <img src="media/image1.PNG" width="80%">
+</p>
+
+<p align="center">
+  <img src="media/image1.PNG" width="200">
+</p>
+
+<p align="center">
+  <img src="media/image1.PNG"  height="20%">
+</p>
+
+<p align="center">
+  <img src="media/image1.PNG"  height="200">
+</p>
 
 
