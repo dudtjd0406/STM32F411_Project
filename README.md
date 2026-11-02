@@ -31,7 +31,7 @@ STM32F411 Project test
 3. 세 번째 항목
 
 
-[![이미지](이미지주소.jpg)](https://www.naver.com/)
+[image1]: 이미지주소.jpg "이미지 제목"https://www.naver.com/
 
 
 ```javascript
@@ -43,6 +43,8 @@ function hello() {
 def hello():
     print("Hello World")
 ```
-```bash
-npm install package-name
-```
+
+| 열1 | 열2 | 열3 |
+|:-----|:-----|:-----|
+| 데이터1 | 데이터2 | 데이터3 |
+| 데이터4 | 데이터5 | 데이터6 |
