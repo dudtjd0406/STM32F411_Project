@@ -648,10 +648,18 @@ SFR: 저장 공간이긴 한데, 이 공간에 값을 쓰거나 읽는 행위 �
 #### 12. HAL_Delay(1000); 실행
 <img src="./img/F411_R_012.png"> <br>
 
+---
+
+## 실습: LED(LD2) 출력 확인 (오실로스코프 + 디버거)
+
+디버그로 `HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, ...)` 을 실행하면서, 실제 핀 출력 파형(오실로스코프)과 GPIOA 레지스터 값(Expressions 창)을 함께 확인합니다.
+
+#### 1. 오실로스코프로 핀 출력 파형 확인 (Tektronix TDS 2012B)
+<img src="./img/image_32d342.jpg" width="320">
+<img src="./img/image_62d40d.jpg" width="320"> <br>
+
+#### 2. Expressions 창에서 GPIOA 레지스터(ODR) 값 확인
+<img src="./img/image_33fc53.jpg" width="320">
+<img src="./img/image_25f488.jpg" width="320"> <br>
+
 </details>
-
-![이미지](image_32d342.jpg)
-![이미지](image_33fc53.jpg)
-![이미지](img/image_62d40d.jpg)
-![이미지](image_25f488.jpg)
-
