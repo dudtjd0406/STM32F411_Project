@@ -650,16 +650,27 @@ SFR: 저장 공간이긴 한데, 이 공간에 값을 쓰거나 읽는 행위 �
 
 ---
 
-## 실습: LED(LD2) 출력 확인 (오실로스코프 + 디버거)
+## 실습: PA6 핀 출력 확인 (오실로스코프 + 디버거)
 
-디버그로 `HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, ...)` 을 실행하면서, 실제 핀 출력 파형(오실로스코프)과 GPIOA 레지스터 값(Expressions 창)을 함께 확인합니다.
+기존 LD2(PA5) 대신 **PA6** 핀을 GPIO 출력으로 사용하여, PA6의 출력 레벨을 High/Low로 바꾸면서 실제 핀 출력 파형(오실로스코프)과 GPIOA 레지스터 값(Expressions 창)을 함께 확인합니다.
 
-#### 1. 오실로스코프로 핀 출력 파형 확인 (Tektronix TDS 2012B)
-<img src="./img/image_32d342.jpg" width="320">
-<img src="./img/image_62d40d.jpg" width="320"> <br>
+- PA6은 GPIOA의 6번 핀이므로 ODR의 bit 6에 해당합니다. (`0x40 = 1 << 6`)
+- PA6이 출력 모드로 설정되어 있으면 GPIOA->MODER의 bit[13:12] = `01` 입니다. (Expressions 창의 MODER `0xa80010a0` 에서 확인)
 
-#### 2. Expressions 창에서 GPIOA 레지스터(ODR) 값 확인
-<img src="./img/image_33fc53.jpg" width="320">
-<img src="./img/image_25f488.jpg" width="320"> <br>
+#### 1. 오실로스코프로 PA6 핀 출력 파형 확인 (Tektronix TDS 2012B, CH1 1.00V/div, 10.0ms/div)
+
+| 상승 에지 (Low → High) | 하강 에지 (High → Low) |
+|:---:|:---:|
+| <img src="./img/image_32d342.jpg" width="320"> | <img src="./img/image_62d40d.jpg" width="320"> |
+| 트리거 경사: 상승 | 트리거 경사: 하강 |
+
+#### 2. Expressions 창에서 GPIOA 레지스터 값 확인
+
+| PA6 = High | PA6 = Low |
+|:---:|:---:|
+| <img src="./img/image_33fc53.jpg" width="320"> | <img src="./img/image_25f488.jpg" width="320"> |
+| ODR = `0x40` (bit 6 = 1), IDR = `0xc04c` | ODR = `0x0` (bit 6 = 0), IDR = `0xc00c` |
+
+PA6의 ODR bit 6이 1일 때 IDR의 bit 6도 1(`0x40` 차이)이 되고, 오실로스코프에서는 High 레벨로 측정됩니다. bit 6이 0이면 IDR도 0이 되고 파형은 Low 레벨로 떨어집니다.
 
 </details>
