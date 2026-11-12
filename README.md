@@ -731,4 +731,85 @@ HC-SR04의 TRIG 핀에 10µs 이상의 High 펄스를 주면 센서가 초음파
 - 센서 앞 거리가 가까워지면 출력값이 즉시 작아지고, 원래 위치로 돌아오면 처음과 같은 값(1767mm)으로 돌아오는 것을 확인했습니다.
 - 538mm와 같이 갑자기 튀는 값이 가끔 나오므로, 필요하면 이동평균이나 중앙값 필터를 적용할 수 있습니다.
 
+#### 4. 사용한 코드 (오후 측정, main.c)
+
+- 시스템 클록: HSI 16MHz → PLL(M=16, N=336, P=4) → 84MHz. TIM1은 APB2(분주 없음)에서 84MHz를 받고 Prescaler = 83 이므로 카운터가 1MHz(1틱 = 1µs)로 동작합니다.
+- TRIG1(PA0)은 출력, ECHO1(PA1)은 입력으로 설정했고, `printf`는 USART2(115200bps)로 출력되어 PuTTY(COM9)에서 확인했습니다.
+
+```c
+/* USER CODE BEGIN PD */
+#define HIGH 1
+#define LOW 0
+long unsigned int echo_time;
+int dist;
+/* USER CODE END PD */
+```
+
+```c
+/* USER CODE BEGIN 0 */
+void timer_start(void)
+{
+   HAL_TIM_Base_Start(&htim1);
+}
+
+void delay_us(uint16_t us)
+{
+   __HAL_TIM_SET_COUNTER(&htim1, 0); // initislize counter to start from 0
+   while((__HAL_TIM_GET_COUNTER(&htim1))<us); // wait count until us
+}
+
+void trig(void)
+{
+   HAL_GPIO_WritePin(TRIG1_GPIO_Port, TRIG1_Pin, HIGH);
+   delay_us(10);
+   HAL_GPIO_WritePin(TRIG1_GPIO_Port, TRIG1_Pin, LOW);
+}
+
+uint32_t echo(void) {
+    uint32_t start_tick, start_time, end_time;
+
+    // ECHO HIGH 대기 (최대 10ms)
+    start_tick = HAL_GetTick();
+    while (HAL_GPIO_ReadPin(ECHO1_GPIO_Port, ECHO1_Pin) == GPIO_PIN_RESET) {
+        if ((HAL_GetTick() - start_tick) > 10) return 0;  // 10ms 초과 → 실패
+    }
+    start_time = __HAL_TIM_GET_COUNTER(&htim1);
+
+    // ECHO LOW 대기 (최대 30ms = HC-SR04 최대 측정 시간)
+    start_tick = HAL_GetTick();
+    while (HAL_GPIO_ReadPin(ECHO1_GPIO_Port, ECHO1_Pin) == GPIO_PIN_SET) {
+        if ((HAL_GetTick() - start_tick) > 30) return 0;  // 30ms 초과 → 범위 초과
+    }
+    end_time = __HAL_TIM_GET_COUNTER(&htim1);
+
+    return end_time - start_time;
+}
+/* USER CODE END 0 */
+```
+
+```c
+  /* USER CODE BEGIN 2 */
+  timer_start();
+  printf("Ranging with HC-SR04\n");
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	  trig();
+	  echo_time = echo();
+	  if( echo_time != 0){
+	      dist = (int)(17 * echo_time / 100);
+	      printf("Distance = %d(mm)\n", dist);
+	  }
+	  else printf("Out of Range!\n");
+	  HAL_Delay(1000);
+    /* USER CODE END WHILE */
+```
+
+- `trig()`: TRIG를 High로 올리고 TIM1 카운터로 10µs를 기다린 뒤 Low로 내립니다.
+- `echo()`: ECHO가 High가 될 때까지 최대 10ms, High인 동안 최대 30ms 기다리며, ECHO가 High였던 시간을 µs 단위로 반환합니다. 시간이 초과되면 0을 반환하고 "Out of Range!"를 출력합니다.
+- 거리(mm) = `17 × echo_time / 100` 이며, 루프마다 `HAL_Delay(1000)`으로 약 1초마다 측정합니다. (센서 권장 측정 주기 60ms 이상을 만족)
+
 </details>
